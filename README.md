@@ -1,4 +1,4 @@
-# Health-data-visuaisation
+# Exploring Obesity Prevalence and Lifestyle Factors: Insights from Visualizations Using ggplot in R
 **Project Report:**
 
 This study employs ggplot, a powerful data visualization tool, to explore and illustrate key findings regarding the relationship between lifestyle factors and obesity prevalence across diverse demographic cohorts. By exploring the relationships between variables such as physical activity levels, dietary habits, and substance use with varying levels of obesity, I aim to uncover insights into the multifaceted nature of this health issue.
