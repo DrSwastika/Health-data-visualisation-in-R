@@ -1,0 +1,356 @@
+---
+title: "Obesity"
+author: '201775159'
+date: "2024-02-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Install packages
+
+```{r}
+install.packages(c("dplyr", "ggplot2","gridExtra")) 
+library(ggplot2) 
+library(dplyr) 
+library(gridExtra)
+library(readxl) 
+
+
+```
+
+# Introduction:
+
+Obesity represents an epidemic that poses a significant threat to healthcare resources, primarily due to its correlation with the rise in diabetes, heart disease, hypertension, and cancer cases. These detrimental effects stem from two main factors: the accumulation of excess adipose tissue and the heightened secretion of pathogenic substances from enlarged fat cells.(Bray, 2004). It is now so common within the world's population that it is beginning to replace under-nutrition and infectious diseases as the most significant contributor to ill health.(Kopelman, 2000)
+
+Obesity is typically assessed using body mass index (BMI), calculated as weight in kilograms divided by the square of height in meters (kg/m\^2). (Kopelman, 2000)
+
+According to the WHO classification, individuals with a BMI of 30 or higher are categorized as obese. However, BMI does not account for variations in body composition, and other measures such as waist circumference and waist-to-hip ratio are also used to assess central adiposity.(World Health Organisation, n.d.)
+
+[WHO Classification of Weight Status](https://www.ncbi.nlm.nih.gov/books/NBK513285/bin/bmi__WHO.jpg)\
+Since 1975, global obesity rates have nearly tripled, with over 1.9 billion adults aged 18 and above categorized as overweight in 2016, of which more than 650 million were classified as obese. In the same year, 39% of adults were overweight and 13% were obese. Furthermore, in 2020, approximately 39 million children under the age of 5 were overweight or obese, and in 2016, over 340 million children and adolescents aged 5-19 fell into this category.(World Health Organisation, n.d.)
+
+Lifestyle factors play a significant role in the development and management of obesity. Poor access to a supportive physical environment that encourages physical activity may contribute to overweight and obesity.(Giles-Corti et al., 2003)
+
+This research delves into the complex interplay between lifestyle factors and obesity across different demographic groups. By exploring the relationships between variables such as physical activity levels, dietary habits, and substance use with varying levels of obesity, I aim to uncover insights into the multifaceted nature of this health issue.
+
+**Research Question:**
+
+**"How do lifestyle factors, including physical activity, alcohol and smoking habits, and dietary patterns, correlate with different levels of obesity across various demographic groups, particularly concerning age?"**
+
+The data-set consists of information from 2111 individuals across 3 different countries. It includes information related to individuals' attributes and lifestyle choices, such as gender, age, height, weight, family history of overweight, dietary habits, physical activity level, habits, water intake, monitoring of calorie intake, time spent using technological devices, mode of transportation, and obesity level.
+
+## Loading Data:
+
+```{r}
+Obesity_Data <- read_excel("Obesity_Data.xlsx")
+```
+
+```{r}
+names(Obesity_Data)
+str(Obesity_Data) 
+summary(Obesity_Data)
+
+```
+
+## Data preparation:
+
+In order to interpret the data various steps are taken to pre-process the data set.
+
+### Rounding off data:
+
+Upon reviewing the data-set, it became apparent that certain attributes such as vegetable intake (FCVC), water intake (CH2O), the number of meals per day (NCP), use of technology (TUE), and physical activity (FAF) were recorded as decimal values, contrary to the integer values specified in the data dictionary. To enhance data visualization and simplify analysis, these attributes were rounded off to whole numbers.
+
+```{r}
+Obesity_Data <- Obesity_Data %>%
+  mutate( FAF = round(FAF), 
+          FCVC = round(FCVC),
+          NCP = round(NCP), 
+          CH2O = round(CH2O), 
+          TUE = round(TUE) ) 
+
+```
+
+```{r}
+View(Obesity_Data)
+```
+
+### Checking missing Values:
+
+There were no missing values in the data-set.
+
+```{r}
+missing_values <- colSums(is.na(Obesity_Data))
+print(missing_values[missing_values > 0])
+```
+
+### Cleaning the Data-set:
+
+To ensure data integrity, any duplicate entries in the data-set were removed during this process.
+
+```{r}
+Obesity_Data <- unique(Obesity_Data)
+
+str(Obesity_Data )
+
+summary(Obesity_Data )
+
+```
+
+## Creating visualizations to address Research Question:
+
+As the obesity data-set contains vast amount of information with several variables it is important to use certain data analytical tool to manipulate visualizations, uncover hidden insights, and validate the research question. It serves as a powerful solution to facilitate meaningful analysis, enhance accessibility, and foster the interpretation of vast data-sets.(Lowe and Matthee, 2020)
+
+### 1. To find relationship between physical activity and obesity level:
+
+Numerous studies have consistently demonstrated that higher levels of physical activity are associated with a lower risk of obesity. Regular physical activity helps individuals maintain a healthy weight by expending calories, increasing metabolic rate, and promoting the development of lean muscle mass. Conversely, sedentary behaviour, such as prolonged sitting or low levels of physical activity, is strongly linked to an increased risk of obesity and related health conditions.(Guerra et al., 2006; Andrew et al., 2011)
+
+The visualization presented here explores the correlation between the frequency of physical activity (FAF) and various levels of obesity.
+
+```{r}
+activity_obesity_counts <- Obesity_Data %>%
+  count(FAF, NObeyesdad)
+
+ggplot(activity_obesity_counts, aes(x = FAF, y = n, fill = NObeyesdad)) + 
+geom_bar(stat = "identity") + 
+geom_text(aes(label = n), position = position_stack(vjust = 0.5), 
+          size = 3, color = "black") +
+labs(title = "Obesity Level by Physical Activity Frequency", x = "Physical Activity Frequency", y = "Count") + 
+scale_fill_brewer(palette = "Set2", name = "Obesity Level") + 
+theme(legend.position = "right")
+```
+
+The graph illustrates the distribution of physical activity frequency among individuals across different levels of obesity in our dataset. Each bar represents a specific frequency of physical activity: 0 indicates no physical activity, 1 represents 1 or 2 days, 2 indicates 2 or 3 days, and 3 represents 4 or 5 days of physical activity.
+
+From the graph, it is apparent that a significant proportion of individuals with obesity type 3 (187) do not engage in any physical activity. Conversely, individuals with obesity type 2 (139) are more likely to engage in physical activity for 1 or 2 days. Across all obesity levels, the majority of individuals (750+) engage in physical activity for only 1 or 2 days per week, while approximately 100 individuals participate in physical activity for 4 or 5 days per week.
+
+The observation highlights that individuals classified as having insufficient weight (117) tend to engage in physical activity for 2 or 3 days, indicating a relatively higher level of physical activity compared to other weight categories. Conversely, individuals categorized as having normal weight (97) and those classified under overweight level 1 and 2 (251) typically prefer engaging in physical activity for 1 or 2 days. This suggests variations in physical activity levels across different weight categories, with individuals with insufficient weight exhibiting a slightly higher frequency of physical activity.
+
+### 2. Age Distribution Across Obesity Levels:
+
+The relationship between age and obesity is multifaceted and dynamic. Generally, obesity prevalence tends to increase with age, with the highest rates often observed among middle-aged and older adults.(Mizuno et al., 2004; Giles-Corti et al., 2003)
+
+The relationship between obesity and aging raises significant concerns for several reasons. Firstly, obesity has been linked to a decrease in lifespan, while conversely, caloric restriction has been shown to increase lifespan. Additionally, obesity serves as a risk factor for age-related diseases. Moreover, the prevalence of obesity tends to rise with age. However, what's particularly alarming is that over the past decade, there has been a dramatic increase in obesity prevalence across all age groups.(Mizuno et al., 2004)
+
+This graph focuses on age distribution across obesity levels. Age is a fundamental demographic factor that can significantly influence obesity risk.
+
+```{r}
+
+obesity_percentage <- Obesity_Data %>%
+  mutate(Age_group = cut(Age, breaks = seq(10, 70, by = 10), labels = c("10-19", "20-29", "30-39", "40-49", "50-59", "60-69"))) %>%
+  group_by(Age_group, NObeyesdad) %>%
+  summarise(count = n()) %>%
+  group_by(Age_group) %>%
+  mutate(percentage = count / sum(count) * 100)
+
+ggplot(obesity_percentage, aes(x = Age_group, y = percentage, fill = NObeyesdad)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Obesity Levels Across Different Age Groups",
+       x = "Age Group",
+       y = "Percentage",
+       fill = "Obesity Level") +
+  theme_minimal() +
+  theme(legend.position = "right") +
+  scale_fill_brewer(palette = "Set2")
+
+```
+
+The data analysis reveals distinctive patterns in obesity prevalence across different age groups. Among individuals aged 10-19, the majority fall into the categories of insufficient weight and normal weight. In the subsequent age bracket of 20-29, the percentage of people classified under obesity type 3 is notably higher compared to other obesity categories. Moving into the 30-39 age group, obesity type 2 emerges as the most prevalent category. Interestingly, in the 40-49 age range, obesity type 1 surpasses other obesity levels in terms of prevalence.
+
+Furthermore, the data highlights a significant trend among individuals aged 50-59, where up to 75% of the population is classified as overweight. Finally, it's noteworthy that in the 60-69 age group, all individuals are categorized as having a normal weight.
+
+These findings underscore the dynamic nature of obesity prevalence across different age cohorts, suggesting potential age-related factors influencing weight status.
+
+### 3. Impact of alcohol consumption and smoking on Obesity:
+
+The relationship between smoking, alcohol consumption, and obesity levels is complex and can vary depending on individual behaviors, genetic factors, and socioeconomic influences. Additionally, Heavy smokers also have the tendency to become healvy alcoholic,which causes negative impact on BMI altogether. (Oh and Seo, 2001; Shaikh et al., 2015)
+
+While there is insufficient evidence to support the notion that smoking leads to weight loss or maintains a stable weight, research indicates that quitting smoking is associated with weight gain, and former smokers are at a higher risk of obesity. (Shaikh et al., 2015; Oh and Seo, 2001; Chyou et al., 1997) Similarly, heavy alcohol consumption is linked to increased prevalence of obesity. Poor dietary habits, characterized by low intake of fruits and vegetables and high consumption of fats and sugars, also contribute to higher rates of obesity.(Chyou et al., 1997)
+
+To streamline our dataset, we consolidated different types of obesity levels into broader categories. Specifically, we combined insufficient and normal weight into a single category labeled "Low or normal weight," while grouping overweight type 1 and 2 together as "Overweight." Additionally, obesity types 1, 2, and 3 were merged into the category "Obesity."
+
+#### 3.1 Pie Chart: Alcohol Consumption and Obesity Level
+
+```{r}
+Obesity_Data <- Obesity_Data %>% 
+  mutate( NObeyesdad_f = case_when( NObeyesdad %in% c("Insufficient_Weight", "Normal_Weight") ~ "Low or normal weight",
+                                    NObeyesdad %in% c("Overweight_Level_I", "Overweight_Level_II") ~ "Overweight",
+                                    NObeyesdad %in% c("Obesity_Type_I", "Obesity_Type_II", "Obesity_Type_III") ~ "Obesity", 
+                                    TRUE ~ NObeyesdad ) )  
+
+calculate_percentage <- function(data, variable) { df_counts <- data %>% group_by(NObeyesdad_f, {{ variable }}) %>% summarise(count = n()) %>% mutate(percentage = count / sum(count) * 100)
+
+return(df_counts) }
+
+alcohol_percentage <- calculate_percentage(Obesity_Data, CALC)
+
+alcohol_pie <- ggplot(alcohol_percentage, aes(x = "", y = percentage, fill = factor(CALC))) +
+  geom_bar(stat = "identity", width = 0.5) +
+  coord_polar("y", start = 0) + 
+  labs(title = "Alcohol Consumption by Obesity Level", fill = "Alcohol Consumption") + 
+  theme_void() + 
+  facet_wrap(~ NObeyesdad_f) + 
+  geom_text(aes(label = paste0(round(percentage), "%")), position = position_stack(vjust = 0.16), size =3 )
+print(alcohol_pie)
+
+```
+
+The pie chart illustrating alcohol consumption patterns reveals intriguing insights. Across all obesity levels, less than 1% of the population consumes alcohol daily. However, the majority (more than 50%) indulge in alcohol occasionally. Notably, among individuals categorized as low or normal weight, 40% abstain from alcohol entirely. In contrast, among those classified as obese, up to 74% consume alcohol occasionally, while 24% abstain completely.
+
+#### 3.2 Pie Chart: Smoking and Obesity Level
+
+```{r}
+smoking_percentage <- calculate_percentage(Obesity_Data, SMOKE)
+
+smoking_pie <- ggplot(smoking_percentage, aes(x = "", y = percentage, fill = factor(SMOKE))) +
+  geom_bar(stat = "identity", width = 1) + 
+  coord_polar("y", start = 0) + 
+  labs(title = "Smoking Status by Obesity Level", fill = "Smoking Status") + 
+  theme_void() + facet_wrap(~NObeyesdad_f) + 
+  geom_text(aes(label = paste0(round(percentage), "%")), position = position_stack(vjust = 0.5))
+print(smoking_pie)
+
+```
+
+Regarding smoking habits, the pie chart depicts that over 95% of the population refrains from smoking across all obesity categories. Interestingly, the percentage of smokers is slightly higher (up to 3%) among individuals classified as low or normal weight compared to other categories.
+
+These findings underscore the nuanced relationship between lifestyle factors such as alcohol consumption and smoking habits and obesity levels, highlighting potential variations in behavior across different weight categories.
+
+### 4. Prevalence of dietary factors and their overall impact on Obesity levels:
+
+Dietary habits play a crucial role in determining obesity levels. Consuming a diet high in processed foods, refined sugars, and unhealthy fats can contribute to weight gain and obesity.(Hasselbalch, 2010)
+
+Ensuring a population has access to healthy eating is fundamental for safeguarding against prevalent diseases, notably obesity.(Crovetto et al., 2018) Research indicates that adopting a prudent or healthy dietary pattern can reduce the risk of overweight and obesity, while following a Western or unhealthy dietary pattern may elevate this risk. By promoting and enabling healthier food choices, we can contribute significantly to preventing and managing obesity, thus fostering overall population health and well-being.(Mu et al., 2017)
+
+#### 4.1 Frequency Table of categorical variables:
+
+To comprehensively describe the dataset, I utilized a frequency table to summarize all categorical variables, including:
+
+1\. Family history of overweight
+
+2\. Consumption of high-caloric food (FAVC)
+
+3\. Inclusion of vegetables in meals (FCVC)
+
+4\. Snacking habits (CAEC)
+
+5\. Number of main meals (NCP)
+
+6\. Smoking behavior (SMOKE)
+
+7\. Water intake (CH2O)
+
+8\. Calorie monitoring (SCC)
+
+9\. Physical activity levels (FAF)
+
+10\. Alcohol consumption (CALC)
+
+11\. Use of Technology (TUE)
+
+12\. Mode of transportation (MTRANS)
+
+13\. Obesity level (NObeyesdad)
+
+```{r}
+categorical_vars <- c("family_history_with_overweight", "FAVC", "FCVC", "NCP", "CAEC", "CH2O", "SMOKE", "SCC", "FAF", "TUE", "CALC", "MTRANS", "NObeyesdad")
+frequency_tables <- lapply(Obesity_Data[categorical_vars], function(var) { table(var) })
+
+print(frequency_tables)
+View(frequency_tables)
+
+
+```
+
+The frequency table helped uncover the distribution of different lifestyle choices among individuals with varying obesity statuses. This information serves as a foundation for constructing a bar chart grid, illustrating how dietary factors are utilized across different lifestyle choices.
+
+#### 4.2 Bar Chart Grid:
+
+The bar chart grid offers a comprehensive snapshot of different dietary factors distributed across various obesity levels. Six categorical variables, namely SCC, FAVC, FCVC, CAEC, NCP, and CH2O, were analyzed.
+
+```{r}
+
+Obesity_Data <- Obesity_Data %>% mutate( NObeyesdad_f = case_when( NObeyesdad %in% c("Insufficient_Weight", "Normal_Weight") ~ "Low/normal", NObeyesdad %in% c("Overweight_Level_I", "Overweight_Level_II") ~ "Overweight", NObeyesdad %in% c("Obesity_Type_I", "Obesity_Type_II", "Obesity_Type_III") ~ "Obesity", TRUE ~ NObeyesdad ) )
+
+```
+
+```{r}
+calculate_percentage <- function(data, variable) { df_counts <- data %>% group_by(NObeyesdad_f, {{ variable }}) %>% summarise(count = n()) %>% mutate(percentage = count / sum(count) * 100)
+
+return(df_counts) }
+
+```
+
+```{r}
+Obesity_Data$FCVC <- as.factor(Obesity_Data$FCVC)
+Obesity_Data$NCP <- as.factor(Obesity_Data$NCP)
+Obesity_Data$CH2O <- as.factor(Obesity_Data$CH2O)
+
+categorical_vars <- c("SCC", "FAVC", "FCVC", "NCP", "CAEC", "CH2O")
+plot_list <- list()
+
+for (var in categorical_vars) {
+  percentage_data <- calculate_percentage(Obesity_Data, !!sym(var))
+
+ plot <- ggplot(percentage_data, aes(x = NObeyesdad_f, y = percentage, fill = !!sym(var))) +
+ geom_bar(stat = "identity", position = "dodge") + 
+ labs(title = paste(var), x = "Obesity Level", y = "Percentage", fill = var) + 
+ theme_minimal()
+
+plot_list[[var]] <- plot
+}
+
+grid.arrange(grobs = plot_list, ncol = 2)
+
+
+```
+
+The analysis revealed several key findings:
+
+\- The majority of the population, especially those with obesity, do not monitor their calorie intake.
+
+\- High-calorie food consumption is highest among individuals with obesity, with up to 98% reporting its consumption.
+
+\- Over 60% of the population includes vegetables in their meals sometimes, with around 50% always including them, particularly in the obese category.
+
+\- Approximately 80% of the obese population consumes more than three meals a day, while 60% of those with low/normal weight do the same.
+
+\- Around 80% of overweight individuals and 100% of those with obesity admit to eating between meals sometimes, while up to 30% of those with low/normal weight report frequent snacking between meals.
+
+\- Regarding water intake, the majority of people consume 1-2 liters of water daily across all categories, with up to 30% of those with obesity drinking more than 2 liters.
+
+These findings shed light on dietary behaviors across different obesity levels and underscore the importance of understanding dietary patterns in managing weight and promoting overall health.
+
+In summary, these visualizations collectively contribute to our understanding of the complex interplay between lifestyle factors, demographic characteristics, and obesity prevalence. They underscore the importance of adopting healthy behaviors, such as regular physical activity and nutritious dietary habits, in preventing and managing obesity.
+
+## References:
+
+Andrew, P.H., Lars Bo, A. and Nuala, M.B. 2011. Physical activity and obesity in children. *British Journal of Sports Medicine.* **45**(11), p866.
+
+Bray, G.A. 2004. Medical Consequences of Obesity. *The Journal of Clinical Endocrinology & Metabolism.* **89**(6), pp.2583-2589.
+
+Chyou, P.H., Burchfiel, C.M., Yano, K., Sharp, D.S., Rodriguez, B.L., Curb, J.D. and Nomura, A.M. 1997. Obesity, alcohol consumption, smoking, and mortality. *Ann Epidemiol.* **7**(4), pp.311-317.
+
+Crovetto, M., Valladares, M., Espinoza, V., Mena, F., Oñate, G., Fernandez, M. and Durán-Agüero, S. 2018. Effect of healthy and unhealthy habits on obesity: a multicentric study. *Nutrition.* **54**, pp.7-11.
+
+Giles-Corti, B., Macintyre, S., Clarkson, J.P., Pikora, T. and Donovan, R.J. 2003. Environmental and Lifestyle Factors Associated with Overweight and Obesity in Perth, Australia. *American Journal of Health Promotion.* **18**(1), pp.93-102.
+
+Guerra, S., Teixeira-Pinto, A., Ribeiro, J., Ascensão, A., Magalhães, J., Andersen, L., Duarte, J. and Mota, J. 2006. Relationship between physical activity and obesity in children and adolescents. *Journal of sports medicine and physical fitness.* **46**(1), p79.
+
+Hasselbalch, A.L. 2010. Genetics of dietary habits and obesity. *Dan Med Bull.* **57**, pB4182.
+
+Kopelman, P.G. 2000. Obesity as a medical problem. *Nature.* **404**(6778), pp.635-643.
+
+Lowe, J. and Matthee, M. 2020. Requirements of Data Visualisation Tools to Analyse Big Data: A Structured Literature Review. In: *Responsible Design, Implementation and Use of Information and Communication Technology, 2020//, Cham*. Springer International Publishing, pp.469-480.
+
+Mizuno, T., Shu, I.W., Makimura, H. and Mobbs, C. 2004. Obesity Over the Life Course. *Science of Aging Knowledge Environment.* **2004**(24), pp.re4-re4.
+
+Mu, M., Xu, L.F., Hu, D., Wu, J. and Bai, M.J. 2017. Dietary Patterns and Overweight/Obesity: A Review Article. *Iran J Public Health.* **46**(7), pp.869-876.
+
+Oh, H.S. and Seo, W.S. 2001. The compound relationship of smoking and alcohol consumption with obesity. *Yonsei medical journal.* **42**(5), pp.480-487.
+
+Shaikh, R.A., Siahpush, M., Singh, G.K. and Tibbits, M. 2015. Socioeconomic Status, Smoking, Alcohol use, Physical Activity, and Dietary Behavior as Determinants of Obesity and Body Mass Index in the United States: Findings from the National Health Interview Survey. *Int J MCH AIDS.* **4**(1), pp.22-34.
+
+World Health Organisation. n.d. *Obesity and Overweight.* [Online]. [Accessed 23/2/2024]. Available from: <https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight>
