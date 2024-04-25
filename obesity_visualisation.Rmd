@@ -1,13 +1,10 @@
 ---
 title: "Obesity"
-author: '201775159'
-date: "2024-02-15"
+author: 'Dr. Swastika'
+date: "25-04-2024"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ### Install packages
 
